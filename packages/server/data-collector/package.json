@@ -1,0 +1,19 @@
+{
+  "name": "@covid-tracker/data-collector",
+  "version": "1.0.0",
+  "description": "Application that is responsible to collect csv covid cases to parse and store it (WIP)",
+  "main": "src/server.ts",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "dev:server": "tsnd --inspect --transpile-only --clear --ignore-watch node_modules src/server.ts"
+  },
+  "dependencies": {
+    "csv-parser": "^2.3.3",
+    "date-fns": "^2.16.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.6.2",
+    "ts-node-dev": "^1.0.0-pre.61"
+  }
+}

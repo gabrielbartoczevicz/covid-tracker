@@ -1,0 +1,27 @@
+{
+  "name": "covid-tracker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/gabrielbartoczevicz/covid-tracker.git",
+  "author": "Gabriel Bartoczevicz <gabriel.bartoczevicz@gmail.com>",
+  "license": "MIT",
+  "private": "true",
+  "workspaces": {
+    "packages": [
+      "packages/server/*",
+      "packages/clients/*"
+    ]
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.0.1",
+    "@typescript-eslint/parser": "^4.0.1",
+    "eslint": "^7.8.1",
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-import-resolver-typescript": "^2.3.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-react": "^7.20.6",
+    "eslint-plugin-react-hooks": "^4.1.0",
+    "typescript": "^4.0.2"
+  }
+}
