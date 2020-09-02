@@ -1,7 +1,12 @@
 import csv from 'csv-parser';
 import fs from 'fs';
 import path from 'path';
-import { format, subDays } from 'date-fns';
+import {
+  format, subDays,
+} from 'date-fns';
+
+import IToStoreLine from './dtos/IToStoreLine';
+import generateCsv from './providers/generateCsv';
 
 const { log } = console;
 
@@ -20,8 +25,20 @@ const parser = csv({
 
 const parsedCsv = csvReadStream.pipe(parser);
 
-const data = [];
+const finalData: IToStoreLine[] = [];
 
-parsedCsv.on('data', async (line) => data.push(line));
+parsedCsv.on('data', async (line) => {
+  if (line.estadonotificacao.toLowerCase() === 'paraná') {
+    finalData.push({
+      id: line.id,
+      datanotificacao: line.datanotificacao,
+      classificacaofinal: line.classificacaofinal === '' ? 'Em aguardo' : line.classificacaofinal,
+    });
+  }
+});
 
-parsedCsv.on('end', () => log(data));
+parsedCsv.on('end', () => {
+  log('Dados lidos');
+
+  generateCsv(finalData);
+});

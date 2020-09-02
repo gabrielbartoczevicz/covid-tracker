@@ -105,3 +105,6 @@ dist
 
 packages/server/*/tmp/uploads/*
 !packages/server/*/tmp/uploads/.gitkeep
+
+packages/server/*/tmp/static/*
+!packages/server/*/tmp/static/.gitkeep
