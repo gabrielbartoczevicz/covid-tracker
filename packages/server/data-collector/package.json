@@ -6,15 +6,18 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "dev:server": "tsnd --inspect --transpile-only --clear --ignore-watch node_modules src/server.ts"
+    "dev:server": "tsnd -r tsconfig-paths/register --inspect --transpile-only --clear --ignore-watch node_modules src/server.ts"
   },
   "dependencies": {
     "csv-parser": "^2.3.3",
     "csv-writer": "^1.6.0",
-    "date-fns": "^2.16.1"
+    "date-fns": "^2.16.1",
+    "reflect-metadata": "^0.1.13",
+    "tsyringe": "^4.3.0"
   },
   "devDependencies": {
     "@types/node": "^14.6.2",
-    "ts-node-dev": "^1.0.0-pre.61"
+    "ts-node-dev": "^1.0.0-pre.61",
+    "tsconfig-paths": "^3.9.0"
   }
 }
