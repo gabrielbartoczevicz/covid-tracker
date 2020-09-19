@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  
+  app_database:
+    image: 'bitnami/postgresql'
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRESQL_PASSWORD=docker
+      - POSTGRESQL_DATABASE=covid_tracker
+    volumes:
+      - 'postgresql_data:/bitnami/postgresql'
+
+volumes:
+  postgresql_data:
+    driver: local

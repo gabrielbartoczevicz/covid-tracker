@@ -1,3 +1,5 @@
+import IFileNameProviderDTO from '@shared/container/providers/FileNameProvider/dtos/IFileNameProviderDTO';
+
 export default interface IFileNameProvider {
-  generate(prefix: string): string;
+  generate(data: IFileNameProviderDTO): string;
 }

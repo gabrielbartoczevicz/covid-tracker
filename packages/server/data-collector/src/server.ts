@@ -4,8 +4,8 @@ import '@shared/container';
 
 import { container } from 'tsyringe';
 
-import ReadFileService from '@modules/CSVStram/ReadFileService';
+import CreateNotificationsService from '@modules/PopulateData/services/CreateNotificationsService';
 
-const readFile = container.resolve(ReadFileService);
+const createNotifications = container.resolve(CreateNotificationsService);
 
-readFile.execute();
+createNotifications.execute();

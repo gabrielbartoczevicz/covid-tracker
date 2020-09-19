@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 
 import IFileNameProvider from '@shared/container/providers/FileNameProvider/models/IFIleNameProvider';
+import IFileDataDTO from '@modules/PopulateData/dtos/IFileDataDTO';
 
 @injectable()
 class ReadFileService {
@@ -15,10 +16,10 @@ class ReadFileService {
     this.fileNameProvider = fileNameProvider;
   }
 
-  public async execute(): Promise<void> {
-    const fileName = this.fileNameProvider.generate('dados-gov');
+  public async execute(): Promise<IFileDataDTO[]> {
+    const fileName = this.fileNameProvider.generate({ name: 'dados-gov' });
 
-    const csvPath = path.resolve(__dirname, '..', 'tmp', 'uploads', `${fileName}.csv`);
+    const csvPath = path.resolve(__dirname, '..', '..', '..', '..', 'tmp', 'uploads', fileName);
 
     const csvReadStream = fs.createReadStream(csvPath, { encoding: 'latin1' });
 
@@ -29,23 +30,15 @@ class ReadFileService {
 
     const parsedCsv = csvReadStream.pipe(parser);
 
-    const finalData = [];
+    const data: IFileDataDTO[] = [];
 
-    parsedCsv.on('data', async (line) => {
-      if (line.estadonotificacao.toLowerCase() === 'paraná') {
-        finalData.push({
-          id: line.id,
-          datanotificacao: line.datanotificacao,
-          classificacaofinal: line.classificacaofinal === '' ? 'Em aguardo' : line.classificacaofinal,
-        });
-      }
+    parsedCsv.on('data', async (line: IFileDataDTO) => {
+      data.push(line);
     });
 
-    parsedCsv.on('end', () => {
-      const { log } = console;
+    await new Promise((resolve) => parsedCsv.on('end', resolve));
 
-      log(finalData.toString());
-    });
+    return data;
   }
 }
 
