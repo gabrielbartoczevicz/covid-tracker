@@ -3,7 +3,7 @@
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 generator client {
@@ -33,14 +33,4 @@ enum Status {
   HEALED
   DISCARTED
   DEAD
-}
-
-model NotificationsCount {
-  date              DateTime @unique @default(now())
-  healedCount       Float    @map("healed_count")
-  discartedCount    Float    @map("discarted_count")
-  deadCount         Float    @map("dead_count")
-  notificationCount Float    @map("notification_count")
-
-  @@map("notifications_count")
 }

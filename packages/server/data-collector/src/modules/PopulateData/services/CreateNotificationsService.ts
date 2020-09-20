@@ -12,7 +12,11 @@ class CreateNotificationsService {
   public async execute(): Promise<void> {
     const data = await this.readFileService.execute();
 
-    console.log(data[2]);
+    const res = data.filter((element) => element?.municipio.toLowerCase() === 'londrina');
+
+    const londrina = JSON.stringify(res);
+
+    console.log(londrina);
   }
 }
 
