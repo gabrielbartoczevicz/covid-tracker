@@ -1,10 +1,18 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+
+import {
+  Container, Header, HeaderTitle, InputContainer, Input,
+} from './styles';
 
 const Dashboard: React.FC = () => (
-  <View>
-    <Text>Dashboard</Text>
-  </View>
+  <Container>
+    <Header>
+      <HeaderTitle>Covid Tracker</HeaderTitle>
+      <InputContainer>
+        <Input placeholder="Busque por uma localização" />
+      </InputContainer>
+    </Header>
+  </Container>
 );
 
 export default Dashboard;
