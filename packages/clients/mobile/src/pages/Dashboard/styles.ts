@@ -1,6 +1,17 @@
 import { Platform } from 'react-native';
 import styled, { css } from 'styled-components/native';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
+import { FlatList, RectButton } from 'react-native-gesture-handler';
+
+import IDatePickerDTO from '../../dtos/IDatePickerDTO';
+
+interface IDatePickerTextProps {
+  isSelected: boolean;
+}
+
+interface IDatePickerProps extends IDatePickerTextProps {
+  isLast: boolean;
+}
 
 export const Container = styled.View`
   flex: 1;
@@ -40,4 +51,32 @@ export const Input = styled.TextInput`
   font-family: 'Roboto-Regular';
   color: #b7b7cc;
   font-size: 16px;
+`;
+
+export const Content = styled.ScrollView``;
+
+export const DatePickerContainer = styled.View`
+  height: 112px;
+`;
+
+export const DatePickerList = styled(
+  FlatList as new () => FlatList<IDatePickerDTO>,
+)`
+  padding: 32px 24px;
+`;
+
+export const DatePicker = styled(RectButton)<IDatePickerProps>`
+  background: ${(props) => (props.isSelected ? '#93c572' : '#f0f0f5')};
+  flex-direction: row;
+  align-items: center;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-right: 16px;
+  margin-right: ${(props) => ((props.isLast) ? 46 : 16)}px
+`;
+
+export const DatePickerText = styled.Text<IDatePickerTextProps>`
+  color: ${(props) => (props.isSelected ? '#ffffff' : '#b7b7cc')};
+  font-family: 'Poppins-Medium';
+  font-size: 18px;
 `;

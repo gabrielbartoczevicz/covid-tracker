@@ -26,6 +26,7 @@
         "import/prefer-default-export": "off",
         "semi": "off",
         "global-require": "warn",
+        "import/no-duplicates": "off",
         "@typescript-eslint/semi": [
             "error"
         ],
