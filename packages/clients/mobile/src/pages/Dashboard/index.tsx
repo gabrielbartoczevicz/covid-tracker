@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { subDays, format } from 'date-fns';
+import { subDays, format, startOfMonth } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
+import { startOfWeek } from 'date-fns/esm';
 import {
   Container,
   Header,
@@ -21,44 +22,48 @@ import firstCharToUppercase from '../../utils/firstCharToUppercase';
 const Dashboard: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<IDatePickerDTO>(
     {
-      date: subDays(new Date(), 1),
-      currentWeek: false,
-      currentMonth: false,
+      timeInterval: {
+        start: subDays(new Date(), 1),
+        end: new Date(),
+      },
       allTime: false,
-      dateFormatted: firstCharToUppercase(format(subDays(new Date(), 1), 'dddd', { locale: ptBR })),
+      dateFormatted: firstCharToUppercase(format(subDays(new Date(), 1), 'iiii', { locale: ptBR })),
     },
   );
 
   const handleSelectDate = useCallback((date: IDatePickerDTO) => {
     setSelectedDate(date);
+
+    console.log(date);
   }, [selectedDate]);
 
   const dateToSelect = useMemo(() => {
-    const yesterday = subDays(new Date(), 1);
-
     const datesToSelect: IDatePickerDTO[] = [
       {
-        date: yesterday,
-        currentWeek: false,
-        currentMonth: false,
+        timeInterval: {
+          start: subDays(new Date(), 1),
+          end: new Date(),
+        },
         allTime: false,
-        dateFormatted: firstCharToUppercase(format(yesterday, 'iiii', { locale: ptBR })),
+        dateFormatted: firstCharToUppercase(format(subDays(new Date(), 1), 'iiii', { locale: ptBR })),
       },
       {
-        currentWeek: true,
-        currentMonth: false,
+        timeInterval: {
+          start: startOfWeek(new Date()),
+          end: new Date(),
+        },
         allTime: false,
         dateFormatted: 'Esta semana',
       },
       {
-        currentWeek: false,
-        currentMonth: true,
+        timeInterval: {
+          start: startOfMonth(new Date()),
+          end: new Date(),
+        },
         allTime: false,
         dateFormatted: firstCharToUppercase(format(new Date(), 'MMMM', { locale: ptBR })),
       },
       {
-        currentWeek: false,
-        currentMonth: false,
         allTime: true,
         dateFormatted: 'Todo tempo',
       },

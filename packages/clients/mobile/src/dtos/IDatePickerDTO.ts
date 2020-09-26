@@ -1,7 +1,8 @@
 export default interface IDatePickerDTO {
-  date?: Date;
-  currentWeek: boolean;
-  currentMonth: boolean;
+  timeInterval?: {
+    start: Date,
+    end: Date
+  };
   allTime: boolean;
   dateFormatted: string;
 }
