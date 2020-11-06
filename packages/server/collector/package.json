@@ -1,5 +1,5 @@
 {
-  "name": "@covid-tracker/data-collector",
+  "name": "@covid-tracker/collector",
   "version": "1.0.0",
   "description": "Application that is responsible to collect csv covid cases to parse and store it (WIP)",
   "main": "src/server.ts",
