@@ -25,6 +25,7 @@
         "@typescript-eslint/camelcase": "off",
         "import/prefer-default-export": "off",
         "semi": "off",
+        "camelcase": "off",
         "global-require": "warn",
         "import/no-duplicates": "off",
         "@typescript-eslint/semi": [
