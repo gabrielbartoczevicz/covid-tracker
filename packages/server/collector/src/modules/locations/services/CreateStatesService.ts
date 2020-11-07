@@ -1,13 +1,15 @@
-import { inject } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
+
+import { info, warn } from '@shared/logger';
 
 import IStatesRepository from '@modules/locations/repositories/IStatesRepository';
 import State from '@modules/locations/infra/typeorm/entities/State';
-import { info, warn } from '@shared/logger';
 
 interface IRequest {
   name: string
 }
 
+@injectable()
 class CreateStatesService {
   private statesRepository: IStatesRepository;
 
