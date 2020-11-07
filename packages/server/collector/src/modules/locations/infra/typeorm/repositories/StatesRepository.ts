@@ -1,9 +1,9 @@
 import { getRepository, Repository } from 'typeorm';
 
-import IStatesRepository from '@modules/notification/repositories/IStatesRepository';
-import ICreateStateDTO from '@modules/notification/dtos/ICreateStateDTO';
-import IFindStateByNameDTO from '@modules/notification/dtos/IFindStateByNameDTO';
-import State from '@modules/notification/infra/typeorm/entities/State';
+import IStatesRepository from '@modules/locations/repositories/IStatesRepository';
+import ICreateStateDTO from '@modules/locations/dtos/ICreateStateDTO';
+import IFindStateByNameDTO from '@modules/locations/dtos/IFindStateByNameDTO';
+import State from '@modules/locations/infra/typeorm/entities/State';
 
 class StatesRepository implements IStatesRepository {
   private repository: Repository<State>;

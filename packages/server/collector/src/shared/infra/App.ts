@@ -1,10 +1,12 @@
 import 'reflect-metadata';
 
-import CronService from '@modules/notification/services/CronService';
+import { error, info, warn } from '@shared/logger';
 
 class App {
   public run(): void {
-    new CronService().execute();
+    warn('Is server running?');
+    info('Server is running');
+    error('Server is not running');
   }
 }
 
