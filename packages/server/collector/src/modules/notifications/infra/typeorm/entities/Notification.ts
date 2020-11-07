@@ -10,22 +10,34 @@ import {
 } from 'typeorm';
 import { uuid } from 'uuidv4';
 
-import State from '@modules/locations/infra/typeorm/entities/State';
+import City from '@modules/locations/infra/typeorm/entities/City';
 
-@Entity('cities')
-class City {
+@Entity('notifications')
+class Notification {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  name: string;
+  date: Date;
 
   @Column()
-  state_id: string;
+  epi_week: number;
 
-  @ManyToOne(() => State)
-  @JoinColumn({ name: 'state_id' })
-  state: State;
+  @Column()
+  notifications: number;
+
+  @Column()
+  deaths: number;
+
+  @Column()
+  recovered: number;
+
+  @Column()
+  city_id: string;
+
+  @ManyToOne(() => City)
+  @JoinColumn({ name: 'city_id' })
+  city: City;
 
   @CreateDateColumn()
   created_at: Date;
@@ -39,4 +51,4 @@ class City {
   }
 }
 
-export default City;
+export default Notification;
