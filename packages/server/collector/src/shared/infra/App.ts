@@ -1,12 +1,32 @@
 import 'reflect-metadata';
 
-import { error, info, warn } from '@shared/logger';
+import { info, error } from '@shared/logger';
+
+import AppError from '@shared/errors/AppError';
+
+import GetNotificationsFromFileService from '@modules/notifications/services/GetNotificationsFromFileService';
 
 class App {
-  public run(): void {
-    warn('Is server running?');
-    info('Server is running');
-    error('Server is not running');
+  public async run(): Promise<void> {
+    const getNotificationsFromFile = new GetNotificationsFromFileService();
+
+    try {
+      const data = await getNotificationsFromFile.execute();
+
+      const index = Math.round(data.length / 2);
+
+      info(String(index));
+
+      info(JSON.stringify(data[index]));
+    } catch (e) {
+      if (e instanceof AppError) {
+        error(e.message);
+      } else {
+        error(e);
+      }
+
+      process.exit();
+    }
   }
 }
 
