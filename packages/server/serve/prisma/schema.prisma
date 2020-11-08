@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model City {
+  id            String          @id @default(uuid())
+  name          String
+  stateId       String          @map("state_id")
+  state         State           @relation(fields: [stateId], references: [id])
+  notifications Notification[]
+
+  @@map("cities")
+}
+
+model Notification {
+  id            String   @id @default(uuid())
+  date          DateTime
+  epiWeek       Int      @map("epi_week")
+  notifications Int
+  deaths        Int
+  recovered     Int
+  cityId        String   @map("city_id")
+  city          City     @relation(fields: [cityId], references: [id])
+
+  @@map("notifications")
+}
+
+model State {
+  id         String   @id @default(uuid())
+  name       String
+  cities     City[]
+
+  @@map("states")
+}

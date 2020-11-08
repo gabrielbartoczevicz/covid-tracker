@@ -1,0 +1,26 @@
+{
+  "name": "@covid-tracker/serve",
+  "version": "1.0.0",
+  "description": "Read-only API that provides corona virus notification numbers",
+  "main": "src/server.ts",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsnd -r tsconfig-paths/register --inspect --transpile-only --clear --ignore-watch node_modules src/server.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^2.10.2",
+    "chalk": "^4.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "tsyringe": "^4.3.0"
+  },
+  "devDependencies": {
+    "@prisma/cli": "^2.10.2",
+    "@types/cors": "^2.8.8",
+    "@types/express": "^4.17.8",
+    "@types/node": "^14.14.6",
+    "ts-node-dev": "^1.0.0",
+    "tsconfig-paths": "^3.9.0"
+  }
+}
