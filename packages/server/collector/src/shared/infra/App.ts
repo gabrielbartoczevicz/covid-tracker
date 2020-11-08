@@ -1,48 +1,48 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 import 'reflect-metadata';
-
-import { info, error } from '@shared/logger';
-
-import AppError from '@shared/errors/AppError';
+import { container } from 'tsyringe';
 
 import '@shared/container';
 
+import { info, error } from '@shared/logger';
+import AppError from '@shared/errors/AppError';
+
 import GetNotificationsFromFileService from '@modules/notifications/services/GetNotificationsFromFileService';
-import { container } from 'tsyringe';
 import CreateStatesService from '@modules/locations/services/CreateStatesService';
 import CreateCitiesService from '@modules/locations/services/CreateCitiesService';
+import CreateNotificationsService from '@modules/notifications/services/CreateNotificationsService';
 
-class App {
-  public async run(): Promise<void> {
-    const getNotificationsFromFile = new GetNotificationsFromFileService();
-    const createState = container.resolve(CreateStatesService);
-    const createCity = container.resolve(CreateCitiesService);
+const getNotificationsFromFile = new GetNotificationsFromFileService();
+const createState = container.resolve(CreateStatesService);
+const createCity = container.resolve(CreateCitiesService);
+const createNotifications = container.resolve(CreateNotificationsService);
 
-    try {
-      const data = await getNotificationsFromFile.execute();
+async function run(): Promise<void> {
+  try {
+    const data = await getNotificationsFromFile.execute();
 
-      const index = Math.round(data.length / 2);
+    for (const n of data) {
+      const { id: state_id } = await createState.execute({ name: n.estado });
 
-      const n = data[index];
+      const { id: city_id } = await createCity.execute({ name: n.municipio, state_id });
 
-      info(JSON.stringify(n));
-
-      const state = await createState.execute({ name: n.estado });
-
-      info(JSON.stringify(state));
-
-      const city = await createCity.execute({ name: n.municipio, state_id: state.id });
-
-      info(JSON.stringify(city));
-    } catch (e) {
-      if (e instanceof AppError) {
-        error(e.message);
-      } else {
-        error(e);
-      }
-
-      process.exit();
+      await createNotifications.execute({
+        city_id,
+        date: new Date(n.data),
+        epi_week: Number(n.semanaepi),
+        notifications: Number(n.casosnovos),
+        deaths: Number(n.obitosnovos),
+        recovered: Number(n.recuperadosnovos),
+      });
     }
+  } catch (err) {
+    if (err instanceof AppError) {
+      error(err.message);
+    }
+  } finally {
+    info('File read finished');
   }
 }
 
-export default new App().run;
+export default run;

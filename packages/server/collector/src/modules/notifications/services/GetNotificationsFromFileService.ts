@@ -28,7 +28,11 @@ class GetNotificationsFromFileService {
 
     const data: IFileDataDTO[] = [];
 
-    parsedCsv.on('data', (line) => data.push(line));
+    parsedCsv.on('data', (line) => {
+      if (String(line.estado).toLowerCase() === 'pr' && line.municipio !== '') {
+        data.push(line);
+      }
+    });
 
     await new Promise((resolve) => parsedCsv.on('end', resolve));
 

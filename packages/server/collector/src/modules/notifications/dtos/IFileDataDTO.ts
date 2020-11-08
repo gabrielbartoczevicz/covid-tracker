@@ -1,3 +1,9 @@
 export default interface IFileDataDTO {
-  [key: string]: string;
+  estado?: string;
+  municipio?: string;
+  data: string;
+  semanaepi: number;
+  casosnovos: number;
+  obitosnovos: number;
+  recuperadosnovos: number;
 }
