@@ -3,7 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import { info, warn } from '@shared/logger';
 
 import IStatesRepository from '@modules/locations/repositories/IStatesRepository';
-import State from '@modules/locations/infra/typeorm/entities/State';
+import { State } from '@prisma/client';
 
 interface IRequest {
   name: string
