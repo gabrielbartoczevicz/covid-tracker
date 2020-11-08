@@ -12,6 +12,7 @@
     "@prisma/client": "^2.10.2",
     "chalk": "^4.1.0",
     "cors": "^2.8.5",
+    "date-fns": "^2.16.1",
     "express": "^4.17.1",
     "tsyringe": "^4.3.0"
   },

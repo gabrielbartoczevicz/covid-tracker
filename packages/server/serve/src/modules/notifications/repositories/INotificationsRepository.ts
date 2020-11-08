@@ -1,7 +1,9 @@
 import { Notification } from '@prisma/client';
 
-import IFindNotificationsByCityIDDTO from '@modules/notifications/dtos/IFindNotificationsByCityIDDTO';
+import IFindNotificationsByCityIDAndDateIntervalDTO from '@modules/notifications/dtos/IFindNotificationsByCitiesIDAndDateIntervalDTO';
 
 export default interface INotificationsRepository {
-  findByCityID(data: IFindNotificationsByCityIDDTO): Promise<Notification[]>;
+  findByCitiesIDAndDateInterval(
+    data: IFindNotificationsByCityIDAndDateIntervalDTO
+  ): Promise<Notification[]>;
 }
