@@ -1,5 +1,7 @@
 import { inject, injectable } from 'tsyringe';
-import { isAfter } from 'date-fns';
+import {
+  isAfter, startOfDay,
+} from 'date-fns';
 
 import { Notification } from '@prisma/client';
 
@@ -8,6 +10,8 @@ import AppError from '@shared/errors/AppError';
 import ICitiesRepository from '@modules/notifications/repositories/ICitiesRepository';
 import INotificationsRepository from '@modules/notifications/repositories/INotificationsRepository';
 import IStatesRepository from '@modules/notifications/repositories/IStatesRepository';
+
+import { IMeta, INotifications } from '@modules/notifications/dtos/ISummaryNotificationsDTO';
 
 interface IRequest {
   state_name?: string;
@@ -19,9 +23,8 @@ interface IRequest {
 }
 
 interface IResponse {
-  notifications: number;
-  deaths: number;
-  recovered: number;
+  meta: IMeta;
+  notifications: INotifications;
 }
 
 @injectable()
@@ -49,17 +52,19 @@ class FindNotificationsService {
 
     const { start, end } = interval;
 
-    const now = Date.now();
+    const now = startOfDay(Date.now());
+    const compare_start = startOfDay(start);
+    const compare_end = startOfDay(end);
 
-    if (isAfter(now, start)) {
+    if (isAfter(compare_start, now)) {
       throw new AppError('Start date must be before now date', 422);
     }
 
-    if (isAfter(now, end)) {
+    if (isAfter(compare_end, now)) {
       throw new AppError('End date must be before now date', 422);
     }
 
-    let notifications: Notification[] = [];
+    let storedNotifications: Notification[] = [];
 
     if (state_name) {
       const state = await this.statesRepository.findByName({ name: state_name });
@@ -72,7 +77,7 @@ class FindNotificationsService {
         state_id: state.id,
       });
 
-      notifications = await this.notificationsRepository.findByCitiesIDAndDateInterval({
+      storedNotifications = await this.notificationsRepository.findByCitiesIDAndDateInterval({
         cities_id: cities.map(({ id }) => id),
         interval,
       });
@@ -85,25 +90,33 @@ class FindNotificationsService {
         throw new AppError('City not found', 422);
       }
 
-      notifications = await this.notificationsRepository.findByCitiesIDAndDateInterval({
+      storedNotifications = await this.notificationsRepository.findByCitiesIDAndDateInterval({
         cities_id: cities.map(({ id }) => id),
         interval,
       });
     }
 
-    const count = notifications.reduce((acc, notification) => (
-      {
-        n: acc.n + notification.notifications,
-        d: acc.d + notification.deaths,
-        r: acc.r + notification.recovered,
-      }
-    ),
-    { n: 0, d: 0, r: 0 });
+    const meta = storedNotifications.reduce((acc, { notifications, deaths, recovered }) => ({
+      total_notifications: acc.total_notifications + notifications,
+      total_deaths: acc.total_deaths + deaths,
+      total_recovered: acc.total_recovered + recovered,
+    }), {
+      total_notifications: 0,
+      total_deaths: 0,
+      total_recovered: 0,
+    });
+
+    const notificationsFormatted = storedNotifications.map(
+      ({
+        date, notifications, deaths, recovered,
+      }) => ({
+        date, notifications, deaths, recovered,
+      }),
+    );
 
     return {
-      notifications: count.n,
-      deaths: count.d,
-      recovered: count.r,
+      meta,
+      notifications: notificationsFormatted,
     };
   }
 }
