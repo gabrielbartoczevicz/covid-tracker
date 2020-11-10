@@ -38,13 +38,34 @@
                 "argsIgnorePattern": "_"
             }
         ],
-        "react/jsx-props-no-spreading": [1, { "extensions": [".tsx"] }],
-        "react/jsx-filename-extension": [1, { "extensions": [".tsx"] }],
+        "react/jsx-props-no-spreading": [
+            1,
+            {
+                "extensions": [
+                    ".tsx"
+                ]
+            }
+        ],
+        "react/jsx-filename-extension": [
+            1,
+            {
+                "extensions": [
+                    ".tsx"
+                ]
+            }
+        ],
         "import/extensions": [
             "error",
             "ignorePackages",
             {
                 "ts": "never",
+                "tsx": "never"
+            }
+        ],
+        "@typescript-eslint/no-use-before-define": [
+            "error",
+            "ignorePackages",
+            {
                 "tsx": "never"
             }
         ],
