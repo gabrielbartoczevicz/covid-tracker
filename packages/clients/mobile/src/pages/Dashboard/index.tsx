@@ -1,14 +1,14 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert } from 'react-native';
-import { format, formatISO } from 'date-fns';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/mobile';
-import * as Yup from 'yup';
 
 import { IDatePicker, IFormData, INotifications, IResponse } from './dtos';
 
 import client from '../../services/client';
 import options from '../../utils/getDatePickerOptions';
+
+import Input from '../../components/Input';
 
 import {
   Container,
@@ -20,82 +20,60 @@ import {
   DatePicker,
   DatePickerText,
 } from './styles';
-import Input from '../../components/Input';
-
 
 const Dashboard: React.FC = () => {
   const [notificationsSummary, setNotificationsSummary] = useState<INotifications>();
-  const [selectedDate, setSelectedDate] = useState<IDatePicker>(options[0]);
+  const [selectedDate, setSelectedDate] = useState<IDatePicker>();
+  const [selectedLocation, setSelectedLocation] = useState<string>();
+
   const formRef = useRef<FormHandles>(null);
 
-  const handleSubmit = useCallback(async (data: IFormData) => {
-    const { city_name, state_name } = data;
-    const { interval } = selectedDate;
-
-    const dataToSubmit = {
-      state_name,
-      city_name,
-      interval,
-    }
-
-    const schema = Yup.object().shape({
-      city_name: Yup.string().required('Município obrigatório'),
-      interval: Yup.object().shape({
-        start: Yup.date().required('Data de início obrigatória'),
-        end: Yup.date().required('Data de fim obrigatória'),
-      })
-    });
-
-    try {
-      await schema.validate(dataToSubmit, { abortEarly: true });
-
-      const res = await client.post<IResponse>('/notifications', dataToSubmit);
-
-      const { meta, notifications } = res.data;
-
-      const notificationsParsed = {
-        meta,
-        notifications: notifications.map(({ date, ...rest }) => ({
-          date: new Date(date),
-          ...rest,
-        }))
-      }
-
-      setNotificationsSummary(notificationsParsed);
-
-      console.log(notificationsSummary);
-    } catch (err) {
-      Alert.alert('Erro', err);
-    }
-
-  }, [notificationsSummary])
+  const handleSelectLocation = useCallback((data: IFormData) => {
+    setSelectedLocation(data.city_name);
+  }, [])
 
   const handleSelectDate = useCallback((date: IDatePicker) => {
     setSelectedDate(date);
-  }, [selectedDate]);
+  }, []);
 
-  const notificationsFormatted = useMemo(() => {
-    if (!notificationsSummary) {
-      return null;
+  useEffect(() => {
+    console.log(JSON.stringify({ selectedDate, selectedLocation }));
+
+    if (!selectedDate || !selectedLocation) {
+      return;
     }
 
-    const { notifications } = notificationsSummary;
+    const filter = {
+      city_name: selectedLocation,
+      interval: selectedDate.interval,
+    }
 
-    const data = notifications.map(({ date, notifications }) => ({
-      label: format(date, 'dd MM'),
-      values: notifications
-    }));
+    client.post<IResponse>('/notifications', filter)
+      .then(response => {
+        const { meta, notifications } = response.data;
 
-    console.log(JSON.stringify(data));
+        const notificationsParsed = {
+          meta,
+          notifications: notifications.map(({ date, ...rest }) => ({
+            date: new Date(date),
+            ...rest,
+          }))
+        }
 
-    return data;
-  }, [notificationsSummary])
+        setNotificationsSummary(notificationsParsed);
+
+        console.log(JSON.stringify(notificationsSummary));
+      })
+      .catch(err => {
+        Alert.alert('Erro', err);
+      })
+  }, [selectedLocation, selectedDate]);
 
   return (
     <Container>
-      <Form onSubmit={handleSubmit} ref={formRef}>
-        <Header>
-          <HeaderTitle>Covid Tracker</HeaderTitle>
+      <Header>
+        <HeaderTitle>Covid Tracker</HeaderTitle>
+        <Form onSubmit={handleSelectLocation} ref={formRef}>
           <Input
             name="city_name"
             icon="map-pin"
@@ -106,32 +84,32 @@ const Dashboard: React.FC = () => {
             returnKeyType="send"
             onSubmitEditing={() => formRef.current?.submitForm()}
           />
-        </Header>
+        </Form>
+      </Header>
 
-        <Content>
-          <DatePickerContainer>
-            <DatePickerList
-              data={options}
-              keyExtractor={(date) => date.dateFormatted}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              renderItem={({ item, index }) => (
-                <DatePicker
-                  onPress={() => handleSelectDate(item)}
-                  isSelected={item.dateFormatted === selectedDate.dateFormatted}
-                  isLast={options.length - 1 === index}
+      <Content>
+        <DatePickerContainer>
+          <DatePickerList
+            data={options}
+            keyExtractor={(date) => date.dateFormatted}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item, index }) => (
+              <DatePicker
+                onPress={() => handleSelectDate(item)}
+                isSelected={item.dateFormatted === selectedDate?.dateFormatted}
+                isLast={options.length - 1 === index}
+              >
+                <DatePickerText
+                  isSelected={item.dateFormatted === selectedDate?.dateFormatted}
                 >
-                  <DatePickerText
-                    isSelected={item.dateFormatted === selectedDate.dateFormatted}
-                  >
-                    {item.dateFormatted}
-                  </DatePickerText>
-                </DatePicker>
-              )}
-            />
-          </DatePickerContainer>
-        </Content>
-      </Form>
+                  {item.dateFormatted}
+                </DatePickerText>
+              </DatePicker>
+            )}
+          />
+        </DatePickerContainer>
+      </Content>
     </Container>
   );
 };

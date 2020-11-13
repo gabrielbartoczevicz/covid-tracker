@@ -38,3 +38,12 @@ export interface IFormData {
   state_name?: string;
   city_name: string;
 }
+
+export interface IRequest {
+  state_name?: string;
+  city_name: string;
+  interval: {
+    start: Date;
+    end: Date;
+  }
+}
