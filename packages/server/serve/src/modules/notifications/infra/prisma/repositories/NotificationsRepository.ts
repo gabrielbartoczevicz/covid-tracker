@@ -9,13 +9,14 @@ class NotificationsRepository implements INotificationsRepository {
   public async findByCitiesIDAndDateInterval(
     { cities_id, interval }: IFindNotificationsByCityIDDTO,
   ): Promise<Notification[]> {
-    const citiesInArray = `'${cities_id.join("', '")}'`;
+    const citiesInArrayString = `'${cities_id.join("', '")}'`;
 
     const notifications = await client.$queryRaw<Notification[]>(
-      `SELECT * 
-         FROM notifications 
-        WHERE city_id IN (${citiesInArray}) 
-          AND date BETWEEN DATE('${format(interval.start, 'yyyy-MM-dd')}') AND DATE('${format(interval.end, 'yyyy-MM-dd')}');`,
+      `SELECT n.* 
+         FROM notifications n
+        WHERE n.city_id IN (${citiesInArrayString}) 
+          AND n.date BETWEEN DATE('${format(interval.start, 'yyyy-MM-dd')}') AND DATE('${format(interval.end, 'yyyy-MM-dd')}')
+        ORDER BY n.date;`,
     );
 
     return notifications;
