@@ -3,9 +3,16 @@ import styled, { css } from 'styled-components/native';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { FlatList, RectButton } from 'react-native-gesture-handler';
 
-import { IDatePickerProps, IDatePickerTextProps } from './props';
+import { IDatePicker } from './dtos';
 
-import IDatePickerDTO from '../../dtos/IDatePickerDTO';
+interface IDatePickerTextProps {
+  isSelected: boolean;
+}
+
+interface IDatePickerProps {
+  isSelected: boolean;
+  isLast: boolean;
+}
 
 export const Container = styled.View`
   flex: 1;
@@ -56,12 +63,12 @@ export const DatePickerContainer = styled.View`
 `;
 
 export const DatePickerList = styled(
-  FlatList as new () => FlatList<IDatePickerDTO>,
+  FlatList as new () => FlatList<IDatePicker>,
 )`
   padding: 32px 24px;
 `;
 
-export const DatePicker = styled(RectButton)<IDatePickerProps>`
+export const DatePicker = styled(RectButton) <IDatePickerProps>`
   background: ${(props) => (props.isSelected ? '#93c572' : '#f0f0f5')};
   flex-direction: row;
   align-items: center;
