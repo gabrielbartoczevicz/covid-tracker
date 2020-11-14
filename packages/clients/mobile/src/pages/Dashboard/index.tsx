@@ -71,6 +71,7 @@ const Dashboard: React.FC = () => {
     setSelectedDate(date);
   }, []);
 
+  // TODO: fix date comparation from TZ server and application
   const notificationsFormatted = useMemo(() => {
     if (!notificationsSummary) {
       return null;
@@ -89,20 +90,26 @@ const Dashboard: React.FC = () => {
         )
       ];
 
-      formatted = dates.map(m => ({
-        label: format(addHours(m, 3), 'MMM', { locale }),
-        value: notifications.reduce((acc, { date, notifications }) => (
-          acc + (isSameMonth(date, m) ? notifications : 0)
-        ), 0)
-      }));
+      console.log(JSON.stringify(dates.map(d => new Date(d))));
+
+      let dateToAddHour: Date;
+
+      formatted = dates.map(m => {
+        dateToAddHour = addHours(m, 3);
+
+        return {
+          label: format(dateToAddHour, 'MMM', { locale }),
+          value: notifications.reduce((acc, { date, notifications }) => (
+            acc + (isSameMonth(date, dateToAddHour) ? notifications : 0)
+          ), 0)
+        }
+      });
     } else {
       formatted = notifications.map(({ date, notifications }) => ({
         label: format(addHours(date, 3), 'dd/MMM', { locale }),
         value: notifications,
       }));
     }
-
-    console.log(JSON.stringify(notifications.map(n => n.date)));
 
     return formatted;
   }, [notificationsSummary]);
