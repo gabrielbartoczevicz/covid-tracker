@@ -1,6 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, Dimensions } from 'react-native';
 import { FormHandles } from '@unform/core';
+import { format } from 'date-fns';
+import { LineChart } from 'react-native-chart-kit';
 import { Form } from '@unform/mobile';
 
 import { IDatePicker, IFormData, INotifications, IResponse } from './dtos';
@@ -19,6 +21,7 @@ import {
   DatePickerList,
   DatePicker,
   DatePickerText,
+  LoadingChartText,
 } from './styles';
 
 const Dashboard: React.FC = () => {
@@ -27,14 +30,6 @@ const Dashboard: React.FC = () => {
   const [selectedLocation, setSelectedLocation] = useState<string>();
 
   const formRef = useRef<FormHandles>(null);
-
-  const handleSelectLocation = useCallback((data: IFormData) => {
-    setSelectedLocation(data.city_name);
-  }, [])
-
-  const handleSelectDate = useCallback((date: IDatePicker) => {
-    setSelectedDate(date);
-  }, []);
 
   useEffect(() => {
     console.log(JSON.stringify({ selectedDate, selectedLocation }));
@@ -68,6 +63,27 @@ const Dashboard: React.FC = () => {
         Alert.alert('Erro', err);
       })
   }, [selectedLocation, selectedDate]);
+
+  const handleSelectLocation = useCallback((data: IFormData) => {
+    setSelectedLocation(data.city_name);
+  }, [])
+
+  const handleSelectDate = useCallback((date: IDatePicker) => {
+    setSelectedDate(date);
+  }, []);
+
+  const notificationsFormatted = useMemo(() => {
+    if (!notificationsSummary) {
+      return null;
+    }
+
+    const { notifications } = notificationsSummary;
+
+    return notifications.map(({ date, notifications }) => ({
+      labels: format(date, 'dd/MM'),
+      notifications,
+    }));
+  }, [notificationsSummary]);
 
   return (
     <Container>
@@ -109,7 +125,51 @@ const Dashboard: React.FC = () => {
             )}
           />
         </DatePickerContainer>
+
+        {!notificationsFormatted && (
+          <LoadingChartText>
+            Selecione uma cidade e um período{'\n'}de tempo acima para a consulta.
+          </LoadingChartText>
+        )}
+
+        {notificationsFormatted && (
+          <LineChart
+            data={{
+              labels: notificationsFormatted.map(({ labels }) => labels),
+              datasets: [
+                {
+                  data: notificationsFormatted.map(({ notifications }) => notifications),
+                }
+              ]
+            }}
+            width={Dimensions.get("window").width - 18} // from react-native
+            height={220}
+            yAxisInterval={1} // optional, defaults to 1
+            chartConfig={{
+              backgroundGradientFrom: "#93c572",
+              backgroundGradientTo: "#93c572",
+              decimalPlaces: 2, // optional, defaults to 2dp
+              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              style: {
+                borderRadius: 8
+              },
+              propsForDots: {
+                r: 4,
+                strokeWidth: 1,
+                stroke: "#9bcf79"
+              }
+            }}
+            bezier
+            style={{
+              marginVertical: 8,
+              marginHorizontal: 8,
+              borderRadius: 16
+            }}
+          />
+        )}
       </Content>
+
     </Container>
   );
 };

@@ -2,6 +2,7 @@ import { Platform } from 'react-native';
 import styled, { css } from 'styled-components/native';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { FlatList, RectButton } from 'react-native-gesture-handler';
+import { LineChart } from 'react-native-chart-kit';
 
 import { IDatePicker } from './dtos';
 
@@ -82,4 +83,11 @@ export const DatePickerText = styled.Text<IDatePickerTextProps>`
   color: ${(props) => (props.isSelected ? '#ffffff' : '#b7b7cc')};
   font-family: 'Poppins-Medium';
   font-size: 18px;
+`;
+
+export const LoadingChartText = styled.Text`
+  color: #b7b7cc;
+  font-family: 'Poppins-Medium';
+  font-size: 18px;
+  text-align: center;
 `;
