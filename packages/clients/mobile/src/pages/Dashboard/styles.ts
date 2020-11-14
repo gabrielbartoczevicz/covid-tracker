@@ -2,7 +2,6 @@ import { Platform } from 'react-native';
 import styled, { css } from 'styled-components/native';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { FlatList, RectButton } from 'react-native-gesture-handler';
-import { LineChart } from 'react-native-chart-kit';
 
 import { IDatePicker } from './dtos';
 
@@ -13,6 +12,10 @@ interface IDatePickerTextProps {
 interface IDatePickerProps {
   isSelected: boolean;
   isLast: boolean;
+}
+
+interface IChartTextProps {
+  isErrored?: boolean;
 }
 
 export const Container = styled.View`
@@ -83,10 +86,10 @@ export const DatePickerText = styled.Text<IDatePickerTextProps>`
   font-size: 18px;
 `;
 
-export const LoadingChartText = styled.Text`
-  color: #b7b7cc;
-  font-family: 'Poppins-Medium';
-  font-size: 18px;
+export const ChartText = styled.Text<IChartTextProps>`
+  color: ${(props) => (props.isErrored) ? '#cd5c5c' : '#b7b7cc'};
+  font-family: 'Roboto-Regular';
+  font-size: 16px;
   text-align: center;
 `;
 
@@ -94,5 +97,4 @@ export const ChartContainer = styled.View`
   flex: 1;
   align-items: center;
   justify-content: center;
-  background-color: #ff0000;
 `;

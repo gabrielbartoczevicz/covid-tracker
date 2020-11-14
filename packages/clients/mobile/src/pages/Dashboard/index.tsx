@@ -22,7 +22,7 @@ import {
   DatePickerList,
   DatePicker,
   DatePickerText,
-  LoadingChartText,
+  ChartText,
   ChartContainer,
 } from './styles';
 import { addHours } from 'date-fns/esm';
@@ -31,6 +31,7 @@ const Dashboard: React.FC = () => {
   const [notificationsSummary, setNotificationsSummary] = useState<INotifications>();
   const [selectedDate, setSelectedDate] = useState<IDatePicker>();
   const [selectedLocation, setSelectedLocation] = useState<string>();
+  const [hasErrors, setHasErrors] = useState(false);
 
   const formRef = useRef<FormHandles>(null);
 
@@ -56,11 +57,10 @@ const Dashboard: React.FC = () => {
           }))
         }
 
+        setHasErrors(false);
         setNotificationsSummary(notificationsParsed);
       })
-      .catch(err => {
-        Alert.alert('Erro', err);
-      })
+      .catch(() => setHasErrors(true));
   }, [selectedLocation, selectedDate]);
 
   const handleSelectLocation = useCallback((data: IFormData) => {
@@ -114,6 +114,36 @@ const Dashboard: React.FC = () => {
     return formatted;
   }, [notificationsSummary]);
 
+  const messageContent = useMemo(() => {
+    if (hasErrors) {
+      return 'Ocorreu algum erro com a consulta\nTente novamente';
+    }
+
+    if (notificationsSummary?.notifications.length === 0) {
+      return 'Não há notificações no filtro usado';
+    }
+
+    if (!notificationsFormatted) {
+      return 'Selecione uma cidade e um período\nde tempo acima para a consulta.';
+    }
+  }, [notificationsSummary, notificationsFormatted, hasErrors])
+
+  const verticalLabelRotationDegree = useMemo(() => {
+    if (!notificationsSummary) {
+      return 0;
+    }
+
+    const { notifications } = notificationsSummary;
+
+    const count = notifications.length;
+
+    if (count > 7 && count < 30) {
+      return 90;
+    }
+
+    return 0;
+  }, [notificationsSummary])
+
   return (
     <Container>
       <Header>
@@ -155,13 +185,13 @@ const Dashboard: React.FC = () => {
           />
         </DatePickerContainer>
 
-        {!notificationsFormatted && (
-          <LoadingChartText>
-            Selecione uma cidade e um período{'\n'}de tempo acima para a consulta.
-          </LoadingChartText>
+        {messageContent && (
+          <ChartText isErrored={hasErrors}>
+            {messageContent}
+          </ChartText>
         )}
 
-        {notificationsFormatted && (
+        {(notificationsFormatted && !messageContent) && (
           <ChartContainer>
             <LineChart
               data={{
@@ -172,9 +202,10 @@ const Dashboard: React.FC = () => {
                   }
                 ]
               }}
-              width={Dimensions.get("window").width - 20} // from react-native
+              width={Dimensions.get("window").width - 40} // from react-native
               height={250}
-              yAxisInterval={1} // optional, defaults to 
+              yLabelsOffset={26}
+              verticalLabelRotation={verticalLabelRotationDegree}
               chartConfig={{
                 backgroundGradientFrom: "#f0f0f5",
                 backgroundGradientTo: "#f0f0f5",
@@ -190,6 +221,7 @@ const Dashboard: React.FC = () => {
               withVerticalLines={false}
               style={{
                 borderRadius: 8,
+                paddingBottom: 2 * verticalLabelRotationDegree,
               }}
             />
           </ChartContainer>
