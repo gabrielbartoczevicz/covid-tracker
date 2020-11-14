@@ -55,9 +55,7 @@ export const Input = styled.TextInput`
   font-size: 16px;
 `;
 
-export const Content = styled.ScrollView`
-  border: 1px crimson dashed;
-`;
+export const Content = styled.ScrollView``;
 
 export const DatePickerContainer = styled.View`
   height: 112px;
@@ -90,4 +88,11 @@ export const LoadingChartText = styled.Text`
   font-family: 'Poppins-Medium';
   font-size: 18px;
   text-align: center;
+`;
+
+export const ChartContainer = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  background-color: #ff0000;
 `;

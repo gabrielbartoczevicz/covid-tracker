@@ -47,3 +47,8 @@ export interface IRequest {
     end: Date;
   }
 }
+
+export interface IFormatted {
+  label: string;
+  value: number;
+}

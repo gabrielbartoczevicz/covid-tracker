@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Dimensions } from 'react-native';
 import { FormHandles } from '@unform/core';
-import { format } from 'date-fns';
+import { format, isSameMonth, setMonth } from 'date-fns';
+import locale from 'date-fns/locale/pt-BR';
 import { LineChart } from 'react-native-chart-kit';
 import { Form } from '@unform/mobile';
 
-import { IDatePicker, IFormData, INotifications, IResponse } from './dtos';
+import { IDatePicker, IFormData, INotifications, IResponse, IFormatted } from './dtos';
 
 import client from '../../services/client';
 import options from '../../utils/getDatePickerOptions';
@@ -22,7 +23,9 @@ import {
   DatePicker,
   DatePickerText,
   LoadingChartText,
+  ChartContainer,
 } from './styles';
+import { addHours } from 'date-fns/esm';
 
 const Dashboard: React.FC = () => {
   const [notificationsSummary, setNotificationsSummary] = useState<INotifications>();
@@ -32,8 +35,6 @@ const Dashboard: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
   useEffect(() => {
-    console.log(JSON.stringify({ selectedDate, selectedLocation }));
-
     if (!selectedDate || !selectedLocation) {
       return;
     }
@@ -56,8 +57,6 @@ const Dashboard: React.FC = () => {
         }
 
         setNotificationsSummary(notificationsParsed);
-
-        console.log(JSON.stringify(notificationsSummary));
       })
       .catch(err => {
         Alert.alert('Erro', err);
@@ -79,10 +78,33 @@ const Dashboard: React.FC = () => {
 
     const { notifications } = notificationsSummary;
 
-    return notifications.map(({ date, notifications }) => ({
-      labels: format(date, 'dd/MM'),
-      notifications,
-    }));
+    let formatted: IFormatted[];
+
+    if (notifications.length > 30) {
+      const now = new Date();
+
+      const dates = [
+        ...new Set(
+          notifications.map(({ date }) => now.setMonth(date.getMonth()))
+        )
+      ];
+
+      formatted = dates.map(m => ({
+        label: format(addHours(m, 3), 'MMM', { locale }),
+        value: notifications.reduce((acc, { date, notifications }) => (
+          acc + (isSameMonth(date, m) ? notifications : 0)
+        ), 0)
+      }));
+    } else {
+      formatted = notifications.map(({ date, notifications }) => ({
+        label: format(addHours(date, 3), 'dd/MMM', { locale }),
+        value: notifications,
+      }));
+    }
+
+    console.log(JSON.stringify(notifications.map(n => n.date)));
+
+    return formatted;
   }, [notificationsSummary]);
 
   return (
@@ -133,40 +155,37 @@ const Dashboard: React.FC = () => {
         )}
 
         {notificationsFormatted && (
-          <LineChart
-            data={{
-              labels: notificationsFormatted.map(({ labels }) => labels),
-              datasets: [
-                {
-                  data: notificationsFormatted.map(({ notifications }) => notifications),
+          <ChartContainer>
+            <LineChart
+              data={{
+                labels: notificationsFormatted.map(({ label }) => label),
+                datasets: [
+                  {
+                    data: notificationsFormatted.map(({ value }) => value),
+                  }
+                ]
+              }}
+              width={Dimensions.get("window").width - 20} // from react-native
+              height={250}
+              yAxisInterval={1} // optional, defaults to 
+              chartConfig={{
+                backgroundGradientFrom: "#f0f0f5",
+                backgroundGradientTo: "#f0f0f5",
+                decimalPlaces: 0, // optional, defaults to 2dp
+                color: () => `#b7b7cc`,
+                labelColor: () => `#b7b7cc`,
+                horizontalOffset: 100,
+                propsForDots: {
+                  r: 4,
+                  strokeWidth: 1,
                 }
-              ]
-            }}
-            width={Dimensions.get("window").width - 18} // from react-native
-            height={220}
-            yAxisInterval={1} // optional, defaults to 1
-            chartConfig={{
-              backgroundGradientFrom: "#93c572",
-              backgroundGradientTo: "#93c572",
-              decimalPlaces: 2, // optional, defaults to 2dp
-              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              style: {
-                borderRadius: 8
-              },
-              propsForDots: {
-                r: 4,
-                strokeWidth: 1,
-                stroke: "#9bcf79"
-              }
-            }}
-            bezier
-            style={{
-              marginVertical: 8,
-              marginHorizontal: 8,
-              borderRadius: 16
-            }}
-          />
+              }}
+              withVerticalLines={false}
+              style={{
+                borderRadius: 8,
+              }}
+            />
+          </ChartContainer>
         )}
       </Content>
 

@@ -110,7 +110,7 @@ class FindNotificationsService {
       ({
         date, notifications, deaths, recovered,
       }) => ({
-        date, notifications, deaths, recovered,
+        date: new Date(date), notifications, deaths, recovered,
       }),
     );
 
