@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Dimensions } from 'react-native';
+import { Dimensions } from 'react-native';
 import { FormHandles } from '@unform/core';
-import { format, isSameMonth, setMonth } from 'date-fns';
+import { format, isSameMonth } from 'date-fns';
 import locale from 'date-fns/locale/pt-BR';
 import { LineChart } from 'react-native-chart-kit';
 import { Form } from '@unform/mobile';
@@ -24,6 +24,9 @@ import {
   DatePickerText,
   ChartText,
   ChartContainer,
+  StatusListContainer,
+  StatusCount,
+  StatusTextCount,
 } from './styles';
 import { addHours } from 'date-fns/esm';
 
@@ -90,8 +93,6 @@ const Dashboard: React.FC = () => {
         )
       ];
 
-      console.log(JSON.stringify(dates.map(d => new Date(d))));
-
       let dateToAddHour: Date;
 
       formatted = dates.map(m => {
@@ -128,9 +129,14 @@ const Dashboard: React.FC = () => {
     }
   }, [notificationsSummary, notificationsFormatted, hasErrors])
 
-  const verticalLabelRotationDegree = useMemo(() => {
+  const verticalLabelOption = useMemo(() => {
+    const options = {
+      degree: 0,
+      position: 0,
+    }
+
     if (!notificationsSummary) {
-      return 0;
+      return options;
     }
 
     const { notifications } = notificationsSummary;
@@ -138,11 +144,24 @@ const Dashboard: React.FC = () => {
     const count = notifications.length;
 
     if (count > 7 && count < 30) {
-      return 90;
+      options.degree = 90;
+      options.position = -12;
     }
 
-    return 0;
+    return options;
   }, [notificationsSummary])
+
+  const isInvalidMeta = useMemo(() => {
+    console.log(JSON.stringify(notificationsSummary));
+
+    if (!notificationsSummary) {
+      return false;
+    }
+
+    const { total_notifications, total_deaths, total_recovered } = notificationsSummary.meta;
+
+    return total_notifications === 0 && total_deaths === 0 && total_recovered === 0;
+  }, [notificationsSummary]);
 
   return (
     <Container>
@@ -205,11 +224,12 @@ const Dashboard: React.FC = () => {
               width={Dimensions.get("window").width - 40} // from react-native
               height={250}
               yLabelsOffset={26}
-              verticalLabelRotation={verticalLabelRotationDegree}
+              xLabelsOffset={verticalLabelOption.position}
+              verticalLabelRotation={verticalLabelOption.degree}
               chartConfig={{
                 backgroundGradientFrom: "#f0f0f5",
                 backgroundGradientTo: "#f0f0f5",
-                decimalPlaces: 0, // optional, defaults to 2dp
+                decimalPlaces: 0,
                 color: () => `#b7b7cc`,
                 labelColor: () => `#b7b7cc`,
                 horizontalOffset: 100,
@@ -221,13 +241,32 @@ const Dashboard: React.FC = () => {
               withVerticalLines={false}
               style={{
                 borderRadius: 8,
-                paddingBottom: 2 * verticalLabelRotationDegree,
+                paddingBottom: 2,
               }}
             />
           </ChartContainer>
         )}
-      </Content>
 
+        {!isInvalidMeta && notificationsSummary && (
+          <StatusListContainer>
+            <StatusCount>
+              <StatusTextCount textColor="#fdb814" >
+                Notificações {notificationsSummary.meta.total_notifications}
+              </StatusTextCount>
+            </StatusCount>
+            <StatusCount>
+              <StatusTextCount textColor="#93c572" >
+                Recuperados {notificationsSummary.meta.total_recovered}
+              </StatusTextCount>
+            </StatusCount>
+            <StatusCount>
+              <StatusTextCount textColor="#cd5c5c" >
+                Mortos {notificationsSummary.meta.total_deaths}
+              </StatusTextCount>
+            </StatusCount>
+          </StatusListContainer>
+        )}
+      </Content>
     </Container>
   );
 };

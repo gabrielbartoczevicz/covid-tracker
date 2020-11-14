@@ -4,6 +4,7 @@ import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { FlatList, RectButton } from 'react-native-gesture-handler';
 
 import { IDatePicker } from './dtos';
+import { Dimensions } from 'react-native';
 
 interface IDatePickerTextProps {
   isSelected: boolean;
@@ -16,6 +17,10 @@ interface IDatePickerProps {
 
 interface IChartTextProps {
   isErrored?: boolean;
+}
+
+interface IStatusCountTextProps {
+  textColor: '#93c572' | '#cd5c5c' | '#fdb814';
 }
 
 export const Container = styled.View`
@@ -38,24 +43,6 @@ export const HeaderTitle = styled.Text`
   font-family: 'Poppins-SemiBold';
   font-size: 24px;
   color: #f3f3f3;
-`;
-
-export const InputContainer = styled.View`
-  width: 100%;
-  height: 60px;
-  padding: 0 16px;
-  background: #F0F0F5;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  flex-direction: row;
-  align-items: center;
-`;
-
-export const Input = styled.TextInput`
-  flex: 1;
-  font-family: 'Roboto-Regular';
-  color: #b7b7cc;
-  font-size: 16px;
 `;
 
 export const Content = styled.ScrollView``;
@@ -98,3 +85,25 @@ export const ChartContainer = styled.View`
   align-items: center;
   justify-content: center;
 `;
+
+export const StatusListContainer = styled.View`
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+`;
+
+export const StatusCount = styled.View`
+  background-color: #f0f0f5;
+  border-radius: 8px;
+  margin: 8px 0;
+  padding: 10px 12px;
+  width: 200px;
+`
+
+export const StatusTextCount = styled.Text<IStatusCountTextProps>`
+  color: ${({ textColor }) => textColor};
+  text-align: center;
+  font-family: 'Poppins-Medium';
+  font-size: 18px;
+`
