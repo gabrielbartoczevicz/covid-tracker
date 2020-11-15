@@ -1,3 +1,7 @@
+<h1 align="center">
+    <img src=".github/banner.png" title="Covid Tracker" alt="Covid Tracker" />
+</h1>
+
 <h3 align="center">Covid Tracker - Em construção 🚧</h3>
 
 - [Sobre](#sobre)
